@@ -4,8 +4,6 @@
  *
  * Adopted to commonjs by Andrei Kashcha
  */
-var THREE = require('three');
-
 module.exports = Trackball;
 
 function Trackball( object, domElement ) {
@@ -207,7 +205,8 @@ function Trackball( object, domElement ) {
 	}());
 
 	this.zoomCamera = function () {
-    var factor;
+
+	    var factor;
 
 		if ( _state === STATE.TOUCH_ZOOM ) {
 
@@ -576,40 +575,48 @@ function Trackball( object, domElement ) {
 
 	}
 
-	this.domElement.addEventListener( 'contextmenu', preventEvent, false );
+	this.install = function () {
 
-	this.domElement.addEventListener( 'mousedown', mousedown, false );
+		var domElement = _this.domElement;
 
-	this.domElement.addEventListener( 'mousewheel', mousewheel, false );
-	this.domElement.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+		domElement.addEventListener( 'contextmenu', preventEvent, false );
+		domElement.addEventListener( 'mousedown', mousedown, false );
+		domElement.addEventListener( 'mousewheel', mousewheel, false );
+		domElement.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+		domElement.addEventListener( 'touchstart', touchstart, false );
+		domElement.addEventListener( 'touchend', touchend, false );
+		domElement.addEventListener( 'touchmove', touchmove, false );
 
-	this.domElement.addEventListener( 'touchstart', touchstart, false );
-	this.domElement.addEventListener( 'touchend', touchend, false );
-	this.domElement.addEventListener( 'touchmove', touchmove, false );
+		document.addEventListener( 'mousemove', mousemove);
+		document.addEventListener( 'mouseup', mouseup);
 
-	window.addEventListener( 'keydown', keydown, false );
-	window.addEventListener( 'keyup', keyup, false );
+		window.addEventListener( 'keydown', keydown, false );
+		window.addEventListener( 'keyup', keyup, false );
 
-  this.dispose = function () {
-    var domElement = _this.domElement;
-    domElement.removeEventListener('contextmenu', preventEvent);
-    domElement.removeEventListener('mousedown', mousedown);
-    domElement.removeEventListener('mousewheel', mousewheel);
-    domElement.removeEventListener('DOMMouseScroll', mousewheel);
-    domElement.removeEventListener('touchstart', touchstart);
-    domElement.removeEventListener('touchend', touchend);
-    domElement.removeEventListener('touchmove', touchmove);
+		_this.handleResize();
+
+		// force an update at start
+		_this.update();
+	};
+
+	this.dispose = function () {
+
+		var domElement = _this.domElement;
+
+		domElement.removeEventListener('contextmenu', preventEvent);
+		domElement.removeEventListener('mousedown', mousedown);
+		domElement.removeEventListener('mousewheel', mousewheel);
+		domElement.removeEventListener('DOMMouseScroll', mousewheel);
+		domElement.removeEventListener('touchstart', touchstart);
+		domElement.removeEventListener('touchend', touchend);
+		domElement.removeEventListener('touchmove', touchmove);
 
 		document.removeEventListener( 'mousemove', mousemove);
 		document.removeEventListener( 'mouseup', mouseup);
-    window.removeEventListener('keydown', keydown);
-    window.removeEventListener('keyup', keyup);
-  };
 
-	this.handleResize();
-
-	// force an update at start
-	this.update();
+		window.removeEventListener('keydown', keydown);
+		window.removeEventListener('keyup', keyup);
+	};
 }
 
 function preventEvent( event ) { event.preventDefault(); }
